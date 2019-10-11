@@ -2,6 +2,8 @@
 
 
 # ["qu","an",["a", "b","c", "d"]],
+
+
 def general_knowledge
   [["The Plaka is the oldest quarter of which city?","Athens",["Athens", "Prague","Rome","Vienna"]],
   ["What is an axolotl?","A species of salamander",["A nerve in the brain","A multi-axled vehicle","A type of mortice lock","A species of salamander"]],
@@ -59,141 +61,152 @@ def british_history
   ["Apart from Mad George, which kinder nickname did George III have?","Farmer George",["Big George", "Farmer Giles","Farmer George", "Happy George"]]].sample
 end
 
+def quiz_rules_print_to_screen
+  puts "
+  Can you get 10 in a row?
+
+  Rules...
+  1. If you're stuck you can pass the question by typing: P
+     Remember you only get 2 passes!
+  2. If you get one wrong you start again...
+  3. You have 3 lives! get 3 wrong and YOU'RRRREEEEEE OUT!
+
+  GOOD LUCK!
+
+  /////////////////////////////////////////////////////////
+  "
+end
+
+def standard_question_header
+  puts "Question #{@question_number} of 10... Live Remaining #{@lifes} : Passes Remaining #{@passes}
+  "
+end
+
+def no_passes_remaining_question_header
+  puts  "***You have no remaining pass... you're gunna have to guess!***
+  "
+end
+
+def invalid_input_header
+  puts "***Invalid Input, try again***
+  "
+end
+
+def question_generater
+  question = [general_knowledge,geography,sport,food,british_history].sample
+  question[2] = question[2].shuffle
+  question
+end
+
+def question_duplication_provention
+  question_array = question_generater()
+  while @question_tracker.include?(question_array[0])
+    question_array = question_generater()
+  end
+  @question_tracker << question_array[0]
+  question_array
+end
+
+def question_print_to_screen(question_array)
+  puts "#{question_array[0]}
+
+  A. #{question_array[2][0]}
+  B. #{question_array[2][1]}
+  C. #{question_array[2][2]}
+  D. #{question_array[2][3]}
+
+  "
+end
+
+def answer_user_input
+  print "Type A, B, C or D: "
+  @answer = gets.chomp.downcase
+end
+
+def valid_user_in_check
+  ["a","b","c","d","p"].include?(@answer)
+end
+
+def correct_answer(question_array)
+  if question_array[1] == question_array[2][0]
+    correct_answer = "a"
+  elsif question_array[1] == question_array[2][1]
+    correct_answer = "b"
+  elsif question_array[1] == question_array[2][2]
+    correct_answer = "c"
+  else
+    correct_answer = "d"
+  end
+end
+
+def correct_answer_calculater(correct_answer,question_array)
+  if @answer == correct_answer
+    puts "Correct!"
+    @question_number += 1
+  elsif @answer == "p"
+    @passes -= 1
+  else @answer =! correct_answer
+    puts "Wrong... its should have been: #{correct_answer.upcase}. #{question_array[1]}"
+    @question_number *= 0
+    @question_number += 1
+    @lifes -= 1
+  end
+end
+
+def complete_question(valid_question)
+
+  if @passes > 0
+    standard_question_header()
+  else
+    no_passes_remaining_question_header()
+  end
+
+    question_print_to_screen(valid_question)
+    answer_user_input()
+    correct_answer_calculater(correct_answer(valid_question), valid_question)
+    
+end
 
 
-mix = [general_knowledge,geography,sport,food,british_history].sample
-g_n = general_knowledge
-geo = geography
-s = sport
-b_h = british_history
-
-question_tracker = []
 
 
-question_number = 1
-lives = 3
-passes = 2
 
 
-multi_c_r = ["a","b","c","d","p"]
-#MIX!
-puts "
-Can you get 10 in a row?
 
-Rules...
-1. If you're stuck you can pass the question by typing: P
-   Remember you only get 2 passes!
-2. If you get one wrong you start again...
-3. You have 3 lives! get 3 wrong and YOU'RRRREEEEEE OUT!
 
-GOOD LUCK!
 
-/////////////////////////////////////////////////////////
-"
+@question_tracker = []
+@question_number = 1
+@lifes = 3
+@passes = 2
+
+quiz_rules_print_to_screen()
+
+
 start = Time.now
 # Loop Start
-until question_number == 11 || lives == 0
-
-question_array = [general_knowledge,geography,sport,food,british_history].sample
-
-#Duplicate Question Provention
-if question_tracker.include?(question_array[0])
-while question_tracker.include?(question_array[0])
-    question_array = geography
-end
-end
-
-question_tracker << question_array[0]
-mix_s = question_array[2].shuffle
+until @question_number == 11 || @lifes == 0
 
 
-#Correct Answer Anish!
-if question_array[1]==mix_s[0]
-  correct_answer = "a"
-elsif question_array[1]==mix_s[1]
-  correct_answer = "b"
-elsif question_array[1]==mix_s[2]
-  correct_answer = "c"
-else
-  correct_answer = "d"
-end
-
-#Question and 
-puts "
-Question #{question_number} of 10... Live Remaining #{lives} : Passes Remaining #{passes}
-
-#{question_array[0]}
-
-A. #{mix_s[0]}
-B. #{mix_s[1]}
-C. #{mix_s[2]}
-D. #{mix_s[3]}
-
-"
-print "Type A, B, C or D: "
-answer = gets.chomp.downcase
+valid_question = question_duplication_provention()
+puts "#{valid_question[1]}"
 
 
-if answer == "p" && passes == 0
-    while answer == "p"
-puts "
-***You have no remaining pass... you're gunna have to guess!***
+complete_question(valid_question)
 
-#{question_array[0]}
-
-A. #{mix_s[0]}
-B. #{mix_s[1]}
-C. #{mix_s[2]}
-D. #{mix_s[3]}
-
-"
-print "Type A, B, C or D: "
-answer = gets.chomp.downcase
-    end
-elsif multi_c_r.include?(answer) == false
-    while multi_c_r.include?(answer) == false
-puts "
-***Invalid Input, try again***
-        
-#{question_array[0]}
-        
-A. #{mix_s[0]}
-B. #{mix_s[1]}
-C. #{mix_s[2]}
-D. #{mix_s[3]}
-        
-        "
-print "Type A, B, C or D: "
-answer = gets.chomp.downcase
-    end
-end
-
-
-#Correct Answer Cal!
-if answer == correct_answer
-  puts "
-Correct!"
-  question_number += 1
-elsif answer == "p"
-  passes -= 1
-else answer =! correct_answer
-  puts "
-Wrong... its should have been: #{correct_answer.upcase}. #{question_array[1]}"
-  question_number *= 0
-  question_number += 1
-  lives -= 1
-  
-end
 
 
 puts "
 
-*****************************************************************" unless question_number == 11 || lives == 0
+*****************************************************************" unless @question_number == 11 || @lifes == 0
 
 end
+
+
+
 e = Time.now
 time = e - start
-result = question_number == 11 ? "YOU WIN!!!" : "YOU'RRRREEEEEE OUT!!!"
+result = @question_number == 11 ? "YOU WIN!!!" : "YOU'RRRREEEEEE OUT!!!"
  puts "
 #{result}
 Time Taken: #{time}
